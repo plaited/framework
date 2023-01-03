@@ -49,10 +49,11 @@ export class Plait {
   }
   #step(): void {
     for (const bid of this.#running) {
-      const { logicStrand, priority, strandName } = bid
+      const { logicStrand, priority, strandName, baseDynamic } = bid
       const { value, done } = logicStrand.next()
       !done &&
         this.#pending.add({
+          baseDynamic,
           strandName,
           priority,
           logicStrand,
@@ -62,10 +63,10 @@ export class Plait {
     }
     const pending = [ ...this.#pending ]
     const candidates = pending.reduce<CandidateBid[]>(
-      (acc, { request, priority }) => acc.concat(
+      (acc, { request, priority, baseDynamic }) => acc.concat(
         // Flatten bids' request arrays
         request ? request.map(
-          event => ({ priority, ...event }) // create candidates for each request with current bids priority
+          event => ({ priority, baseDynamic, ...event }) // create candidates for each request with current bids priority
         ) : []
       ),
       []
@@ -87,8 +88,9 @@ export class Plait {
         this.#pending.delete(bid)
       }
     }
-    const { eventName, payload } = this.#lastEvent
+    const { eventName, payload, baseDynamic } = this.#lastEvent
     this.stream({
+      baseDynamic,
       streamEvent: streamEvents.select,
       eventName,
       payload,
@@ -105,6 +107,7 @@ export class Plait {
       }
     }
     this.#running.add({
+      baseDynamic,
       strandName: `Trigger(${eventName})`,
       priority: 0,
       logicStrand: logicStrand(),

@@ -32,6 +32,7 @@ export type RulesFunc = () => RuleGenerator
 
 
 export type RunningBid = {
+  baseDynamic?: ValueOf<typeof baseDynamics>
   strandName: string
   priority: number
   logicStrand: RuleGenerator
@@ -39,6 +40,7 @@ export type RunningBid = {
 export type PendingBid = IdiomSet & RunningBid
 
 export type CandidateBid =  { 
+  baseDynamic?: ValueOf<typeof baseDynamics>;
   priority: number;
   eventName: string;
   payload?: any;
